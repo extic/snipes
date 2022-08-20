@@ -25,6 +25,10 @@ module.exports = {
           },
         },
       },
+      {
+        test: /\.(eot|woff|woff2|ttf|png|jpg|gif|svg|ico)$/,
+        type: 'asset/resource'
+      }
     ],
   },
   resolve: {
