@@ -1,176 +1,197 @@
 import tilesImage from './assets/images/tileset.png';
-import { createMaze } from './maze';
+import { createMaze, Direction, Maze } from './maze';
+import { pos, random } from './utils';
+
+const gameSpeed = 700;
 
 type Snipe = {
   posX: number;
   posY: number;
-  lastDirX: number;
-  lastDirY: number;
+  direction: Direction;
   steps: number;
 };
 
-const snipes: Snipe[] = [];
-for (let i = 0; i < 10; i++) {
-  snipes.push({ posX: Math.floor(Math.random() * 40), posY: Math.floor(Math.random() * 20), lastDirX: 0, lastDirY: 0, steps: 0 });
-}
+export type World = {
+  maze: Maze;
+  snipes: Snipe[];
+};
 
-function draw(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, tiles: HTMLImageElement) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  snipes.forEach((snipe) => {
-    ctx.drawImage(tiles, 60, 0, 30, 30, snipe.posX * 30, snipe.posY * 30, 30, 30);
-  });
-}
+function createWorld(): World {
+  const maze = createMaze();
 
-function gameLoop(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, tiles: HTMLImageElement) {
-  snipes.forEach((snipe) => {
-    if (!snipe.steps) {
-      snipe.lastDirX = Math.floor(Math.random() * 3 - 1);
-      snipe.lastDirY = Math.floor(Math.random() * 3 - 1);
-      snipe.steps = Math.floor(Math.random() * 5 + 1);
+  const snipes: Snipe[] = [];
+  while (snipes.length < 50) {
+    const posX = Math.floor(Math.random() * maze.length);
+    const posY = Math.floor(Math.random() * maze.length);
+    if (maze.cells[posY][posX] === 0 && maze.cells[posY][(posX + 1) % maze.length] === 0) {
+      snipes.push({ posX, posY, direction: Direction.None, steps: 0 });
+      maze.cells[posY][posX] = 16;
     }
-    snipe.posX += snipe.lastDirX;
-    snipe.posY += snipe.lastDirY;
-    snipe.steps--;
-  });
+  }
 
-  draw(ctx, canvas, tiles);
+  return { maze, snipes };
+}
+
+function drawWorld(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageElement) {
+  for (let j = 0; j < world.maze.length; j++) {
+    for (let i = 0; i < world.maze.length; i++) {
+      ctx.drawImage(tiles, world.maze.cells[j][i] * 30, 0, 30, 30, i * 30, j * 30, 30, 30);
+    }
+  }
+}
+
+function setDirectionIfPossible(
+  world: World,
+  snipe: Snipe,
+  posX: number,
+  posY: number,
+  modX: number,
+  modY: number,
+  dir: Direction,
+  tileNumber: number
+) {
+  const newPosX = modX ? pos(snipe.posX, modX, world) : snipe.posX;
+  const newPosY = modY ? pos(snipe.posY, modY, world) : snipe.posY;
+
+  if (world.maze.cells[newPosY][newPosX] === 0) {
+    snipe.direction = dir;
+    world.maze.cells[newPosY][newPosX] = tileNumber;
+    snipe.steps = random(15);
+  }
+}
+
+function chooseNewDirection(world: World, snipe: Snipe) {
+  switch (snipe.direction) {
+    case Direction.Top:
+      world.maze.cells[pos(snipe.posY, -1, world)][snipe.posX] = 0;
+      break;
+    case Direction.TopRight:
+      world.maze.cells[pos(snipe.posY, -1, world)][pos(snipe.posX, 1, world)] = 0;
+      break;
+    case Direction.Right:
+      world.maze.cells[snipe.posY][pos(snipe.posX, 1, world)] = 0;
+      break;
+    case Direction.BottomRight:
+      world.maze.cells[pos(snipe.posY, 1, world)][pos(snipe.posX, 1, world)] = 0;
+      break;
+    case Direction.Bottom:
+      world.maze.cells[pos(snipe.posY, 1, world)][snipe.posX] = 0;
+      break;
+    case Direction.BottomLeft:
+      world.maze.cells[pos(snipe.posY, 1, world)][pos(snipe.posX, -1, world)] = 0;
+      break;
+    case Direction.Left:
+      world.maze.cells[snipe.posY][pos(snipe.posX, -1, world)] = 0;
+      break;
+    case Direction.TopLeft:
+      world.maze.cells[pos(snipe.posY, -1, world)][pos(snipe.posX, -1, world)] = 0;
+      break;
+  }
+
+  snipe.direction = Direction.None;
+
+  const randomDir = random(8);
+  switch (randomDir) {
+    case 0:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, 0, -1, Direction.Top, 23);
+      break;
+
+    case 1:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, 1, -1, Direction.TopRight, 24);
+      break;
+
+    case 2:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, 1, 0, Direction.Right, 17);
+      break;
+
+    case 3:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, 1, 1, Direction.BottomRight, 18);
+      break;
+
+    case 4:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, 0, 1, Direction.Bottom, 19);
+      break;
+
+    case 5:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, -1, 1, Direction.BottomLeft, 20);
+      break;
+
+    case 6:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, -1, 0, Direction.Left, 21);
+      break;
+
+    case 7:
+      setDirectionIfPossible(world, snipe, snipe.posX, snipe.posY, -1, -1, Direction.TopLeft, 22);
+      break;
+  }
+}
+
+function moveSnipeIfPossible(world: World, snipe: Snipe, modX: number, modY: number) {
+  const newPosX = modX ? pos(snipe.posX, modX, world) : snipe.posX;
+  const newPosY = modY ? pos(snipe.posY, modY, world) : snipe.posY;
+  const newPosX2 = modX ? pos(snipe.posX, modX * 2, world) : snipe.posX;
+  const newPosY2 = modY ? pos(snipe.posY, modY * 2, world) : snipe.posY;
+
+  if (world.maze.cells[newPosY2][newPosX2] === 0) { 
+    world.maze.cells[newPosY2][newPosX2] = world.maze.cells[newPosY][newPosX]
+    snipe.steps--;
+  } else {
+    snipe.steps = 0;
+    snipe.direction = Direction.None;
+  }
+
+  world.maze.cells[newPosY][newPosX] = world.maze.cells[snipe.posY][snipe.posX]
+  world.maze.cells[snipe.posY][snipe.posX] = 0;
+  snipe.posX = newPosX;
+  snipe.posY = newPosY;
+}
+
+function moveSnipe(world: World, snipe: Snipe) {
+  switch (snipe.direction) {
+    case Direction.Top:
+      moveSnipeIfPossible(world, snipe, 0, -1);
+      break;
+    case Direction.TopRight:
+      moveSnipeIfPossible(world, snipe, 1, -1);
+      break;
+    case Direction.Right:
+      moveSnipeIfPossible(world, snipe, 1, 0);
+      break;
+    case Direction.BottomRight:
+      moveSnipeIfPossible(world, snipe, 1, 1);
+      break;
+    case Direction.Bottom:
+      moveSnipeIfPossible(world, snipe, 0, 1);
+      break;
+    case Direction.BottomLeft:
+      moveSnipeIfPossible(world, snipe, -1, 1);
+      break;
+    case Direction.Left:
+      moveSnipeIfPossible(world, snipe, -1, 0);
+      break;
+    case Direction.TopLeft:
+      moveSnipeIfPossible(world, snipe, -1, -1);
+      break;
+  }  
+}
+
+function moveSnipes(world: World) {
+  world.snipes.forEach((snipe) => {
+    if (snipe.steps === 0) {
+      chooseNewDirection(world, snipe);
+    } else {
+      moveSnipe(world, snipe);
+    }
+  });
+}
+
+function gameLoop(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageElement) {
+  moveSnipes(world);
+  drawWorld(world, ctx, tiles);
 
   setTimeout(() => {
-    gameLoop(ctx, canvas, tiles);
-  }, 300);
-}
-
-function main1() {
-  const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-  if (!canvas) {
-    throw new Error('Browser does not support canvas');
-  }
-
-  const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    throw new Error('Canvas context could not be obtained');
-  }
-
-  const tiles = new Image();
-  tiles.onload = function () {
-    // ctx.drawImage(img, 0, 0);
-    gameLoop(ctx, canvas, tiles);
-  };
-  tiles.src = tilesImage;
-}
-
-
-
-
-
-class Cell {
-  constructor(public x: number, public y: number, public topWall: boolean, public bottomWall: boolean, public leftWall: boolean, public rightWall: boolean, public status: string) {}
-}
-
-const gridLength = 60;
-const cellLength = 7;
-const grid: Cell[][] = [...Array(gridLength)].map((_, y) => [...Array(gridLength)].map((_, x) => new Cell(x, y, true, true, true, true, 'unvisited')));
-const cellList: Cell[] = [];
-
-function paintGrid(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  for (let j=0; j<gridLength; j++) {
-    for (let i=0; i<gridLength; i++) {
-      const cell = grid[j][i];
-      const posX = i * cellLength;
-      const posY = j * cellLength;
-      if (cell.status === 'visited') {
-        ctx.fillStyle = 'red';
-      } else if (cell.status === 'unvisited') {
-        ctx.fillStyle = 'blue';
-      } else {
-        ctx.fillStyle = 'white';
-      }
-      ctx.fillRect(posX, posY, cellLength, cellLength);
-
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = 'black';
-      ctx.beginPath();
-      if (cell.topWall) {
-
-        ctx.moveTo(posX + 0, posY + 0.5);
-        ctx.lineTo(posX + cellLength, posY + 0.5);
-      }
-
-      if (cell.leftWall) {
-        ctx.moveTo(posX + 0.5, posY);
-        ctx.lineTo(posX + 0.5, posY + cellLength);
-      }
-
-      if (cell.rightWall) {
-        ctx.moveTo(posX + cellLength - 1 + 0.5, posY);
-        ctx.lineTo(posX + cellLength - 1 + 0.5, posY + cellLength);
-      }
-
-      if (cell.bottomWall) {
-        ctx.moveTo(posX, posY + cellLength - 1 + 0.5);
-        ctx.lineTo(posX + cellLength, posY + cellLength - 1 + 0.5);
-      }
-      ctx.stroke();
-    }
-  }
-}
-
-function step(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): boolean {
-  if (cellList.length === 0) {
-    return true;
-  }
-
-  const currCell = cellList[cellList.length - 1];
-  const unvisitedNeighbours: Cell[] = [];
-  let neighbourCell = grid[(currCell.y - 1 + gridLength) % gridLength][currCell.x];
-  if (neighbourCell.status === 'unvisited') {
-    unvisitedNeighbours.push(neighbourCell);
-  }
-  neighbourCell = grid[(currCell.y + 1) % gridLength][currCell.x];
-  if (neighbourCell.status === 'unvisited') {
-    unvisitedNeighbours.push(neighbourCell);
-  }
-  neighbourCell = grid[currCell.y][(currCell.x - 1 + gridLength) % gridLength];
-  if (neighbourCell.status === 'unvisited') {
-    unvisitedNeighbours.push(neighbourCell);
-  }
-  neighbourCell = grid[currCell.y][(currCell.x + 1) % gridLength];
-  if (neighbourCell.status === 'unvisited') {
-    unvisitedNeighbours.push(neighbourCell);
-  }
-  if (unvisitedNeighbours.length === 0) {
-    currCell.status = 'done';
-    cellList.pop();
-  } else {
-    const chosenCell = unvisitedNeighbours[Math.floor(Math.random() * unvisitedNeighbours.length)]
-    chosenCell.status = 'visited';
-
-    if (currCell.y == (chosenCell.y + 1) % gridLength) {
-      currCell.topWall = false;
-      chosenCell.bottomWall = false;
-    } else if (currCell.y == (chosenCell.y - 1 + gridLength) % gridLength) {
-      currCell.bottomWall = false;
-      chosenCell.topWall = false;
-    } else if (currCell.x == (chosenCell.x + 1) % gridLength) {
-      currCell.leftWall = false;
-      chosenCell.rightWall = false;
-    } else if (currCell.x == (chosenCell.x - 1 + gridLength) % gridLength) {
-      currCell.rightWall = false;
-      chosenCell.leftWall = false;
-    }
-    cellList.push(chosenCell);
-  }
-
-  // step(ctx, canvas);
-
-  return false;
-
-  // paintGrid(ctx, canvas);
-  // setTimeout(() => {
-  //   step(ctx, canvas);
-  // }, 10);
+    gameLoop(world, ctx, tiles);
+  }, gameSpeed);
 }
 
 function main() {
@@ -184,29 +205,23 @@ function main() {
     throw new Error('Canvas context could not be obtained');
   }
   // ctx.imageSmoothingEnabled = false;
-  canvas.width = 800;
-  canvas.height = 800;
+  canvas.width = 900;
+  canvas.height = 900;
 
   const tiles = new Image();
   tiles.onload = function () {
-    const maze = createMaze();
-    for (let j=0; j<maze.length; j++) {
-      for (let i=0; i<maze.length; i++) {
-        ctx.drawImage(tiles, maze.cells[j][i] * 30, 0, 30, 30, i * 30, j * 30, 30, 30);
-      }
-    }  
+    const world = createWorld();
+    gameLoop(world, ctx, tiles);
   };
   tiles.src = tilesImage;
-
 
   // const firstCell = grid[Math.floor(Math.random() * gridLength)][Math.floor(Math.random() * gridLength)]
   // firstCell.status = 'visited';
   // cellList.push(firstCell);
   // // ctx.translate(0.5, 0.5)
   // while (!step(ctx, canvas));
-  
-  // paintGrid(ctx, canvas);
 
+  // paintGrid(ctx, canvas);
 }
 
 main();

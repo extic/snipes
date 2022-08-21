@@ -1,4 +1,4 @@
-const gridLength = 3;
+const gridLength = 4;
 const cellLength = 7;
 
 class GridElement {
@@ -13,7 +13,7 @@ class GridElement {
   ) {}
 }
 
-enum Direction { Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left, TopLeft }
+export enum Direction { None, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left, TopLeft }
 
 function getNeighbour(i: number, j: number, dir: Direction, grid: GridElement[][]): GridElement {
   switch (dir) {
@@ -34,6 +34,7 @@ function getNeighbour(i: number, j: number, dir: Direction, grid: GridElement[][
     case Direction.TopLeft: 
       return grid[(j - 1 + gridLength) % gridLength][(i - 1 + gridLength) % gridLength];
   }
+  throw new Error(`Invalid direction ${dir}`);
 }
 
 function addNeightbourIfNotVisited(currCell: GridElement, grid: GridElement[][], direction: Direction, unvisitedNeighbours: GridElement[]) {
