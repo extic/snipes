@@ -1,6 +1,7 @@
 import { createMaze, Maze } from './maze';
 import { createSnipe, Snipe } from './snipes';
 import { createEgg, Egg } from './eggs';
+import { createHero } from './hero';
 
 export type World = {
   maze: Maze;
@@ -12,6 +13,8 @@ export type World = {
 export function createWorld(eggCount: number): World {
   const maze = createMaze();
 
+  createHero(maze);
+  
   const eggs: Egg[] = [];
   while (eggs.length < eggCount) {
     eggs.push(createEgg(maze));

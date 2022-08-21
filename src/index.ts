@@ -1,5 +1,6 @@
 import tilesImage from './assets/images/tileset.png';
 import { rotateEggs } from './eggs';
+import { rotateHero } from './hero';
 import { moveSnipes } from './snipes';
 import { createWorld, drawWorld, World } from './world';
 
@@ -12,12 +13,13 @@ function gameLoop(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageE
     world.counter = 0;
   }
 
+  rotateHero(world);
   rotateEggs(world);
 
   if (world.counter === 0) {
     moveSnipes(world);
   }
-  
+
   drawWorld(world, ctx, tiles);
 
   setTimeout(() => {
