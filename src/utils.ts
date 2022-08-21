@@ -1,4 +1,4 @@
-import { World } from './index'
+import { World } from "./world";
 
 export function random(size: number): number {
   return Math.floor(Math.random() * size);
