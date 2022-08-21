@@ -1,11 +1,23 @@
 import tilesImage from './assets/images/tileset.png';
+import { rotateEggs } from './eggs';
 import { moveSnipes } from './snipes';
 import { createWorld, drawWorld, World } from './world';
 
-const gameSpeed = 700;
+const gameSpeed = 100;
+const eggCount = 1;
 
 function gameLoop(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageElement) {
-  moveSnipes(world);
+  world.counter++;
+  if (world.counter > 6) {
+    world.counter = 0;
+  }
+
+  rotateEggs(world);
+
+  if (world.counter === 0) {
+    moveSnipes(world);
+  }
+  
   drawWorld(world, ctx, tiles);
 
   setTimeout(() => {
@@ -29,7 +41,7 @@ function main() {
 
   const tiles = new Image();
   tiles.onload = function () {
-    const world = createWorld();
+    const world = createWorld(eggCount);
     gameLoop(world, ctx, tiles);
   };
   tiles.src = tilesImage;

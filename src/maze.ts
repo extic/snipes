@@ -1,5 +1,16 @@
 const gridLength = 4;
-const cellLength = 7;
+const cellLength = 8;
+
+export type Maze = {
+  length: number;
+  cells: number[][];
+  cellLength: number;
+};
+
+type MazeData = {
+  grid: GridElement[][],
+  cellList: GridElement[],
+}
 
 class GridElement {
   constructor(
@@ -83,11 +94,6 @@ function step(grid: GridElement[][], cellList: GridElement[]): boolean {
   return false;
 }
 
-type MazeData = {
-  grid: GridElement[][],
-  cellList: GridElement[],
-}
-
 function createMazeData(): MazeData {
   const grid = [...Array(gridLength)].map((_, y) => [...Array(gridLength)].map((_, x) => new GridElement(x, y, true, true, true, true, 'unvisited')));
 
@@ -98,11 +104,6 @@ function createMazeData(): MazeData {
 
   return { grid, cellList };
 }
-
-export type Maze = {
-  length: number;
-  cells: number[][];
-};
 
 export function createMaze(): Maze {
   const { grid, cellList } = createMazeData();
@@ -196,5 +197,6 @@ export function createMaze(): Maze {
   return {
     length: gridLength * cellLength,
     cells,
+    cellLength,
   };
 }

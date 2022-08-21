@@ -1,4 +1,4 @@
-// const OFF = 0;
+const OFF = 0;
 // const WARN = 1;
 const ERROR = 2;
 
@@ -14,5 +14,6 @@ module.exports = {
     'default-param-last': ERROR,
     'no-var': ERROR,
     'prefer-const': ERROR,
+    'no-constant-condition': OFF,
   },
 };

@@ -1,16 +1,24 @@
 import { createMaze, Maze } from './maze';
 import { createSnipe, Snipe } from './snipes';
+import { createEgg, Egg } from './eggs';
 
 export type World = {
   maze: Maze;
+  eggs: Egg[];
   snipes: Snipe[];
+  counter: number;
 };
 
-export function createWorld(): World {
+export function createWorld(eggCount: number): World {
   const maze = createMaze();
 
+  const eggs: Egg[] = [];
+  while (eggs.length < eggCount) {
+    eggs.push(createEgg(maze));
+  }
+
   const snipes: Snipe[] = [];
-  while (snipes.length < 50) {
+  while (snipes.length < 10) {
     const posX = Math.floor(Math.random() * maze.length);
     const posY = Math.floor(Math.random() * maze.length);
     if (maze.cells[posY][posX] === 0 && maze.cells[posY][(posX + 1) % maze.length] === 0) {
@@ -20,7 +28,7 @@ export function createWorld(): World {
     }
   }
 
-  return { maze, snipes };
+  return { maze, eggs, snipes, counter: 0 };
 }
 
 export function drawWorld(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageElement) {
