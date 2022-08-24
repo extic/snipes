@@ -79,7 +79,8 @@ function moveBullets(world: World) {
       bullet.posX = (bullet.posX + bullet.dirX + world.maze.length) % world.maze.length;
       bullet.posY = (bullet.posY + bullet.dirY + world.maze.length) % world.maze.length;
 
-      if (world.maze.cells[bullet.posY][bullet.posX] === 0) {
+      const target = world.maze.cells[bullet.posY][bullet.posX]
+      if (target === 0) {
         if (bulletPhase) {
           world.maze.cells[bullet.posY][bullet.posX] = 37;
         } else {
@@ -88,6 +89,24 @@ function moveBullets(world: World) {
 
         i++;
       } else {
+        if (target >= 16 && target <= 24) {
+          const index = world.snipes.findIndex((snipe) => 
+            (bullet.posX === snipe.posX && bullet.posY === snipe.posY) ||
+            (bullet.posX === snipe.arrowPosX && bullet.posY === snipe.arrowPosY && (snipe.dirX !== 0 || snipe.dirY !== 0)));
+          if (index !== -1) {
+            const snipe = world.snipes.splice(index, 1)[0];
+            world.maze.cells[snipe.posY][snipe.posX] = 0;
+            if (snipe.dirX !== 0 || snipe.dirY !== 0) {
+              world.maze.cells[snipe.arrowPosY][snipe.arrowPosX] = 0;
+            }
+          }
+        } else if (target >= 25 && target <= 29) {
+          const index = world.eggs.findIndex((egg) => bullet.posX === egg.posX && bullet.posY === egg.posY)
+          if (index !== -1) {
+            const egg = world.eggs.splice(index, 1)[0];
+            world.maze.cells[egg.posY][egg.posX] = 0;
+          }
+        }
         world.bullets.splice(i, 1);
       }
     }

@@ -1,149 +1,105 @@
-import { Direction } from './maze';
 import { pos, random } from './utils';
 import { World } from './world';
 
 export type Snipe = {
   posX: number;
   posY: number;
-  direction: Direction;
+  arrowPosX: number;
+  arrowPosY: number;
+  dirX: number;
+  dirY: number;
   steps: number;
 };
 
 export function createSnipe(posX: number, posY: number): Snipe {
-    return { posX, posY, direction: Direction.None, steps: 0 };
+    return { posX, posY, arrowPosX: 0, arrowPosY: 0, dirX: 0, dirY: 0, steps: 0 };
 }
 
 function setDirectionIfPossible(
   world: World,
   snipe: Snipe,
-  modX: number,
-  modY: number,
-  dir: Direction,
+  dirX: number,
+  dirY: number,
   tileNumber: number
 ) {
-  const newPosX = modX ? pos(snipe.posX, modX, world) : snipe.posX;
-  const newPosY = modY ? pos(snipe.posY, modY, world) : snipe.posY;
+  const newPosX = pos(snipe.posX, dirX, world);
+  const newPosY = pos(snipe.posY, dirY, world);
 
   if (world.maze.cells[newPosY][newPosX] === 0) {
-    snipe.direction = dir;
+    snipe.dirX = dirX;
+    snipe.dirY = dirY;
     world.maze.cells[newPosY][newPosX] = tileNumber;
-    snipe.steps = random(15);
+    snipe.arrowPosX = newPosX;
+    snipe.arrowPosY = newPosY;
+    snipe.steps = random(12) + 2;
   }
 }
 
 function chooseNewDirection(world: World, snipe: Snipe) {
-  switch (snipe.direction) {
-    case Direction.Top:
-      world.maze.cells[pos(snipe.posY, -1, world)][snipe.posX] = 0;
-      break;
-    case Direction.TopRight:
-      world.maze.cells[pos(snipe.posY, -1, world)][pos(snipe.posX, 1, world)] = 0;
-      break;
-    case Direction.Right:
-      world.maze.cells[snipe.posY][pos(snipe.posX, 1, world)] = 0;
-      break;
-    case Direction.BottomRight:
-      world.maze.cells[pos(snipe.posY, 1, world)][pos(snipe.posX, 1, world)] = 0;
-      break;
-    case Direction.Bottom:
-      world.maze.cells[pos(snipe.posY, 1, world)][snipe.posX] = 0;
-      break;
-    case Direction.BottomLeft:
-      world.maze.cells[pos(snipe.posY, 1, world)][pos(snipe.posX, -1, world)] = 0;
-      break;
-    case Direction.Left:
-      world.maze.cells[snipe.posY][pos(snipe.posX, -1, world)] = 0;
-      break;
-    case Direction.TopLeft:
-      world.maze.cells[pos(snipe.posY, -1, world)][pos(snipe.posX, -1, world)] = 0;
-      break;
+  if (snipe.dirX !== 0 || snipe.dirY !== 0) {
+    world.maze.cells[pos(snipe.posY, snipe.dirY, world)][pos(snipe.posX, snipe.dirX, world)] = 0;
   }
 
-  snipe.direction = Direction.None;
+  snipe.dirX = 0;
+  snipe.dirY = 0;
 
   const randomDir = random(8);
   switch (randomDir) {
     case 0:
-      setDirectionIfPossible(world, snipe, 0, -1, Direction.Top, 23);
+      setDirectionIfPossible(world, snipe, 0, -1, 23);
       break;
 
     case 1:
-      setDirectionIfPossible(world, snipe, 1, -1, Direction.TopRight, 24);
+      setDirectionIfPossible(world, snipe, 1, -1, 24);
       break;
 
     case 2:
-      setDirectionIfPossible(world, snipe, 1, 0, Direction.Right, 17);
+      setDirectionIfPossible(world, snipe, 1, 0, 17);
       break;
 
     case 3:
-      setDirectionIfPossible(world, snipe, 1, 1, Direction.BottomRight, 18);
+      setDirectionIfPossible(world, snipe, 1, 1, 18);
       break;
 
     case 4:
-      setDirectionIfPossible(world, snipe, 0, 1, Direction.Bottom, 19);
+      setDirectionIfPossible(world, snipe, 0, 1, 19);
       break;
 
     case 5:
-      setDirectionIfPossible(world, snipe, -1, 1, Direction.BottomLeft, 20);
+      setDirectionIfPossible(world, snipe, -1, 1, 20);
       break;
 
     case 6:
-      setDirectionIfPossible(world, snipe, -1, 0, Direction.Left, 21);
+      setDirectionIfPossible(world, snipe, -1, 0, 21);
       break;
 
     case 7:
-      setDirectionIfPossible(world, snipe, -1, -1, Direction.TopLeft, 22);
+      setDirectionIfPossible(world, snipe, -1, -1, 22);
       break;
   }
-}
-
-function moveSnipeIfPossible(world: World, snipe: Snipe, modX: number, modY: number) {
-  const newPosX = modX ? pos(snipe.posX, modX, world) : snipe.posX;
-  const newPosY = modY ? pos(snipe.posY, modY, world) : snipe.posY;
-  const newPosX2 = modX ? pos(snipe.posX, modX * 2, world) : snipe.posX;
-  const newPosY2 = modY ? pos(snipe.posY, modY * 2, world) : snipe.posY;
-
-  if (world.maze.cells[newPosY2][newPosX2] === 0) { 
-    world.maze.cells[newPosY2][newPosX2] = world.maze.cells[newPosY][newPosX]
-    snipe.steps--;
-  } else {
-    snipe.steps = 0;
-    snipe.direction = Direction.None;
-  }
-
-  world.maze.cells[newPosY][newPosX] = world.maze.cells[snipe.posY][snipe.posX]
-  world.maze.cells[snipe.posY][snipe.posX] = 0;
-  snipe.posX = newPosX;
-  snipe.posY = newPosY;
 }
 
 function moveSnipe(world: World, snipe: Snipe) {
-  switch (snipe.direction) {
-    case Direction.Top:
-      moveSnipeIfPossible(world, snipe, 0, -1);
-      break;
-    case Direction.TopRight:
-      moveSnipeIfPossible(world, snipe, 1, -1);
-      break;
-    case Direction.Right:
-      moveSnipeIfPossible(world, snipe, 1, 0);
-      break;
-    case Direction.BottomRight:
-      moveSnipeIfPossible(world, snipe, 1, 1);
-      break;
-    case Direction.Bottom:
-      moveSnipeIfPossible(world, snipe, 0, 1);
-      break;
-    case Direction.BottomLeft:
-      moveSnipeIfPossible(world, snipe, -1, 1);
-      break;
-    case Direction.Left:
-      moveSnipeIfPossible(world, snipe, -1, 0);
-      break;
-    case Direction.TopLeft:
-      moveSnipeIfPossible(world, snipe, -1, -1);
-      break;
-  }  
+  const newPosX = snipe.arrowPosX;//pos(snipe.posX, snipe.dirX, world);
+  const newPosY = snipe.arrowPosY;//pos(snipe.posY, snipe.dirY, world);
+  const newArrowPosX = pos(snipe.posX, snipe.dirX * 2, world);
+  const newArrowPosY = pos(snipe.posY, snipe.dirY * 2, world);
+
+  if (world.maze.cells[newArrowPosY][newArrowPosX] === 0) { 
+    world.maze.cells[newArrowPosY][newArrowPosX] = world.maze.cells[newPosY][newPosX]
+    snipe.arrowPosX = newArrowPosX;
+    snipe.arrowPosY = newArrowPosY;    
+    snipe.steps--;
+  } else {
+    snipe.steps = 0;
+    snipe.dirX = 0;
+    snipe.dirY = 0;
+  }
+
+  world.maze.cells[newPosY][newPosX] = 16
+  world.maze.cells[snipe.posY][snipe.posX] = 0;
+  snipe.posX = newPosX;
+  snipe.posY = newPosY;
 }
 
 export function moveSnipes(world: World) {
