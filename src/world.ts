@@ -2,11 +2,13 @@ import { createMaze, Maze } from './maze';
 import { createSnipe, Snipe } from './snipes';
 import { createEgg, Egg } from './eggs';
 import { createHero, posX as heroPosX, posY as heroPosY } from './hero';
+import { Bullet } from './bullet';
 
 export type World = {
   maze: Maze;
   eggs: Egg[];
   snipes: Snipe[];
+  bullets: Bullet[];
   counter: number;
   screenWidth: number;
   screenHeight: number;
@@ -33,14 +35,13 @@ export function createWorld(eggCount: number, screenWidth: number, screenHeight:
     }
   }
 
-  return { maze, eggs, snipes, counter: 0, screenWidth, screenHeight };
+  return { maze, eggs, snipes, bullets: [], counter: 0, screenWidth, screenHeight };
 }
 
 export function drawWorld(screenWidth: number, screenHeight: number, world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageElement) {
   const halfWidth = Math.floor(world.screenWidth / 2)
   const halfHeight = Math.floor(world.screenHeight / 2);
 
-  console.log(heroPosX, heroPosY)
   for (let j = 0; j < screenHeight; j++) {
     for (let i = 0; i < screenWidth; i++) {
       ctx.drawImage(

@@ -1,7 +1,7 @@
+import { isKeyPressed } from './keyboard';
 import { Maze } from './maze';
 import { World } from './world';
 
-const pressedKeys: { [key: string]: boolean } = {};
 let rotation = 0;
 let face = false;
 export let posX = 0;
@@ -27,7 +27,7 @@ function drawHero(world: World, erase: boolean) {
 
 export function rotateHero(world: World) {
   rotation++;
-  if (rotation > 2) {
+  if (rotation === 3) {
     rotation = 0;
   }
 
@@ -39,51 +39,41 @@ export function rotateHero(world: World) {
 }
 
 export function moveHero(modX: number, modY: number, world: World) {
-  const newPosX = posX;
-  const newPosY = posY;
+  if (rotation === 0) {
+    drawHero(world, true);
 
-  drawHero(world, true);
-
-  if (pressedKeys['KeyD']) {
-    if (
-      world.maze.cells[posY % world.maze.length][(posX + 1) % world.maze.length] === 0 &&
-      world.maze.cells[(posY - 1 + world.maze.length) % world.maze.length][(posX + 1) % world.maze.length] === 0
-    ) {
-      posX = (posX + 1) % world.maze.length;
+    if (isKeyPressed('Numpad6')) {
+      if (
+        world.maze.cells[posY % world.maze.length][(posX + 1) % world.maze.length] === 0 &&
+        world.maze.cells[(posY - 1 + world.maze.length) % world.maze.length][(posX + 1) % world.maze.length] === 0
+      ) {
+        posX = (posX + 1) % world.maze.length;
+      }
     }
-  }
-  if (pressedKeys['KeyA']) {
-    if (
-      world.maze.cells[posY % world.maze.length][(posX - 2 + world.maze.length) % world.maze.length] === 0 &&
-      world.maze.cells[(posY - 1 + world.maze.length) % world.maze.length][(posX - 2 + world.maze.length) % world.maze.length] === 0
-    ) {
-      posX = (posX - 1 + world.maze.length) % world.maze.length;
+    if (isKeyPressed('Numpad4')) {
+      if (
+        world.maze.cells[posY % world.maze.length][(posX - 2 + world.maze.length) % world.maze.length] === 0 &&
+        world.maze.cells[(posY - 1 + world.maze.length) % world.maze.length][(posX - 2 + world.maze.length) % world.maze.length] === 0
+      ) {
+        posX = (posX - 1 + world.maze.length) % world.maze.length;
+      }
     }
-  }
-  if (pressedKeys['KeyW']) {
-    if (
-      world.maze.cells[(posY - 2 + world.maze.length) % world.maze.length][posX] === 0 &&
-      world.maze.cells[(posY - 2 + world.maze.length) % world.maze.length][(posX - 1 + world.maze.length) % world.maze.length] === 0
-    ) {
-      posY = (posY - 1 + world.maze.length) % world.maze.length;
+    if (isKeyPressed('Numpad8')) {
+      if (
+        world.maze.cells[(posY - 2 + world.maze.length) % world.maze.length][posX] === 0 &&
+        world.maze.cells[(posY - 2 + world.maze.length) % world.maze.length][(posX - 1 + world.maze.length) % world.maze.length] === 0
+      ) {
+        posY = (posY - 1 + world.maze.length) % world.maze.length;
+      }
     }
-  }
-  if (pressedKeys['KeyS']) {
-    if (
-      world.maze.cells[(posY + 1) % world.maze.length][posX] === 0 &&
-      world.maze.cells[(posY + 1) % world.maze.length][(posX - 1 + world.maze.length) % world.maze.length] === 0
-    ) {
-      posY = (posY + 1) % world.maze.length;
+    if (isKeyPressed('Numpad2')) {
+      if (
+        world.maze.cells[(posY + 1) % world.maze.length][posX] === 0 &&
+        world.maze.cells[(posY + 1) % world.maze.length][(posX - 1 + world.maze.length) % world.maze.length] === 0
+      ) {
+        posY = (posY + 1) % world.maze.length;
+      }
     }
+    drawHero(world, false);
   }
-  drawHero(world, false);
-}
-
-export function registerKeyHandlers() {
-  window.onkeyup = function (e) {
-    pressedKeys[e.code] = false;
-  };
-  window.onkeydown = function (e) {
-    pressedKeys[e.code] = true;
-  };
 }
