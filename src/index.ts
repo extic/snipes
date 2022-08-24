@@ -3,13 +3,23 @@ import { handleBullets } from './bullet';
 import { rotateEggs } from './eggs';
 import { moveHero, rotateHero } from './hero';
 import { registerKeyHandlers } from './keyboard';
+import { activateResizeObserver } from './resize-observer';
 import { moveSnipes } from './snipes';
 import { createWorld, drawWorld, World } from './world';
 
 const gameSpeed = 30;
 const eggCount = 1;
-const screenWidth = 30;
-const screenHeight = 30;
+let screenWidth = 10;
+let screenHeight = 10;
+let startDrawX = 0;
+let startDrawY = 0;
+
+export function setScreenWidthAndHeight(width: number, height: number, drawX: number, drawY: number) {
+  screenWidth = width;
+  screenHeight = height;
+  startDrawX = drawX;
+  startDrawY = drawY;
+}
 
 function gameLoop(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageElement) {
   world.counter++;
@@ -27,7 +37,7 @@ function gameLoop(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageE
     moveSnipes(world);
   }
 
-  drawWorld(screenWidth, screenHeight, world, ctx, tiles);
+  drawWorld(screenWidth, screenHeight, startDrawX, startDrawY,  world, ctx, tiles);
 
   setTimeout(() => {
     gameLoop(world, ctx, tiles);
@@ -44,9 +54,8 @@ function main() {
   if (!ctx) {
     throw new Error('Canvas context could not be obtained');
   }
-  // ctx.imageSmoothingEnabled = false;
-  canvas.width = 900;
-  canvas.height = 900;
+
+  activateResizeObserver(canvas);
 
   const tiles = new Image();
   tiles.onload = function () {

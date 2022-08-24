@@ -1,15 +1,21 @@
 {
-    "compilerOptions": {
-      "allowJs": true,
-      "checkJs": true,
-      "noImplicitAny": true,
-      "noImplicitReturns": true,
-      "sourceMap": true,
-      "strict": true,
-      "target": "ESNext",
-      "module": "ESNext",
-      "types": ["node"],
-      "moduleResolution": "node"
-    },
-    "include": ["src/**/*", "index.d.ts"],
-  }
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "types": [
+      "node",
+      "resize-observer-browser"
+    ],
+    "moduleResolution": "node"
+  },
+  "include": [
+    "src/**/*",
+    "index.d.ts"
+  ],
+}

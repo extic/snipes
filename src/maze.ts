@@ -1,4 +1,4 @@
-const gridLength = 4;
+const gridLength = 20 ;
 const cellLength = 8;
 
 export type Maze = {
