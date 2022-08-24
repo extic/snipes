@@ -3,6 +3,7 @@ import { createSnipe, Snipe } from './snipes';
 import { createEgg, Egg } from './eggs';
 import { createHero, posX as heroPosX, posY as heroPosY } from './hero';
 import { Bullet } from './bullet';
+import { increaseEggScore, increaseSnipeScore } from './score';
 
 export type World = {
   maze: Maze;
@@ -22,6 +23,7 @@ export function createWorld(eggCount: number, screenWidth: number, screenHeight:
   const eggs: Egg[] = [];
   while (eggs.length < eggCount) {
     eggs.push(createEgg(maze));
+    increaseEggScore();
   }
 
   const snipes: Snipe[] = [];
@@ -32,6 +34,7 @@ export function createWorld(eggCount: number, screenWidth: number, screenHeight:
       const snipe = createSnipe(posX, posY);
       snipes.push(snipe);
       maze.cells[snipe.posY][snipe.posX] = 16;
+      increaseSnipeScore();
     }
   }
 

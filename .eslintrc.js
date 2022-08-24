@@ -15,5 +15,6 @@ module.exports = {
     'no-var': ERROR,
     'prefer-const': ERROR,
     'no-constant-condition': OFF,
+    '@typescript-eslint/no-non-null-assertion': 'OFF',
   },
 };

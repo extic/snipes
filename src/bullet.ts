@@ -1,5 +1,6 @@
 import { isOnSpeed, posX as heroPosX, posY as heroPosY } from './hero';
 import { isKeyPressed } from './keyboard';
+import { decreaseEggScore, decreaseSnipeScore } from './score';
 import { World } from './world';
 
 let rotation = 0;
@@ -99,12 +100,14 @@ function moveBullets(world: World) {
             if (snipe.dirX !== 0 || snipe.dirY !== 0) {
               world.maze.cells[snipe.arrowPosY][snipe.arrowPosX] = 0;
             }
+            decreaseSnipeScore();
           }
         } else if (target >= 25 && target <= 29) {
           const index = world.eggs.findIndex((egg) => bullet.posX === egg.posX && bullet.posY === egg.posY)
           if (index !== -1) {
             const egg = world.eggs.splice(index, 1)[0];
             world.maze.cells[egg.posY][egg.posX] = 0;
+            decreaseEggScore();
           }
         }
         world.bullets.splice(i, 1);

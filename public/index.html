@@ -1,13 +1,67 @@
 <html>
   <body>
-    <p id="hello-world"></p>
-    <div>abc</div>
+    <header>
+      <div class="column labels">
+        <div class="label dead">Eggs Destroyed</div>
+        <div class="label">Eggs Remaining</div>
+      </div>
+      <div class="column values">
+        <div class="value dead" id="eggs-dead">0</div>
+        <div class="value" id="eggs-alive">0</div>
+      </div>      
+      <div class="separator"></div>
+      <div class="column labels">
+        <div class="label dead">Snipes Killed</div>
+        <div class="label">Snipes Alive</div>
+      </div>
+      <div class="column values">
+        <div class="value dead" id="snipes-dead">0</div>
+        <div class="value" id="snipes-alive">0</div>
+      </div>      
+      <div class="separator"></div>
+      <div class="column labels">
+        <div class="label dead">Ghosts Eliminated</div>
+        <div class="label">Ghosts Remaining</div>
+      </div>
+      <div class="column values">
+        <div class="value dead">14</div>
+        <div class="value">18</div>
+      </div>      
+    </header>
     <canvas id="myCanvas" style="border:1px solid #000000;">
       Your browser does not support the HTML canvas tag.
     </canvas>
   <body>
 
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      display: flex;
+      background-color: rgb(21, 21, 182);
+      color: white;
+      border-bottom: 1px solid black;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .column {
+      padding: 10px 30px;
+    }
+
+    .dead {
+      color: rgb(26, 201, 201);
+    }
+
+    .separator {
+      width: 2px;
+      margin: 0 20px;
+      border-right: 2px solid white;
+    }
+
     canvas {
       /* image-rendering: -moz-crisp-edges; */
       /* image-rendering: -webkit-crisp-edges; */
