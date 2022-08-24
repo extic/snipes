@@ -6,6 +6,7 @@ let rotation = 0;
 let face = false;
 export let posX = 0;
 export let posY = 0;
+export let isOnSpeed = false;
 
 export function createHero(maze: Maze, screenWidth: number, screenHeight: number) {
   posX = (Math.floor(maze.cellLength / 2) - Math.floor(screenWidth / 2) + screenWidth) % screenWidth;
@@ -39,7 +40,7 @@ export function rotateHero(world: World) {
 }
 
 export function moveHero(modX: number, modY: number, world: World) {
-  if (rotation === 0) {
+  if (rotation === 0 || isOnSpeed) {
     drawHero(world, true);
 
     if (isKeyPressed('Numpad6')) {
@@ -74,6 +75,9 @@ export function moveHero(modX: number, modY: number, world: World) {
         posY = (posY + 1) % world.maze.length;
       }
     }
+
     drawHero(world, false);
   }
+
+  isOnSpeed = isKeyPressed('Space');
 }

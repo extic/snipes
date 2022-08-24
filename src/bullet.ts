@@ -1,4 +1,4 @@
-import { posX as heroPosX, posY as heroPosY } from './hero';
+import { isOnSpeed, posX as heroPosX, posY as heroPosY } from './hero';
 import { isKeyPressed } from './keyboard';
 import { World } from './world';
 
@@ -14,7 +14,7 @@ export type Bullet = {
 };
 
 function createBullets(world: World) {
-  if (rotation === 0) {
+  if (rotation === 0 && !isOnSpeed) {
     let dirX = 0;
     let dirY = 0;
 
