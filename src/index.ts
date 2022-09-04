@@ -1,6 +1,5 @@
 import tilesImage from './assets/images/tileset.png';
 import { handleBullets } from './bullet';
-import { rotateEggs } from './eggs';
 import { moveHero, rotateHero } from './hero';
 import { registerKeyHandlers } from './keyboard';
 import { activateResizeObserver } from './resize-observer';
@@ -8,7 +7,7 @@ import { moveSnipes } from './snipes';
 import { createWorld, drawWorld, World } from './world';
 
 const gameSpeed = 30;
-const eggCount = 1;
+const eggCount = 10;
 let screenWidth = 10;
 let screenHeight = 10;
 let startDrawX = 0;
@@ -31,7 +30,7 @@ function gameLoop(world: World, ctx: CanvasRenderingContext2D, tiles: HTMLImageE
   moveHero(1, 0, world);
 
   rotateHero(world);
-  rotateEggs(world);
+  world.eggs.forEach((it) => it.rotate());
 
   if (world.counter === 0) {
     moveSnipes(world);

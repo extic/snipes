@@ -1,31 +1,27 @@
 import { Maze } from './maze';
 import { random } from './utils';
-import { World } from './world';
 
-export type Egg = {
-  posX: number;
-  posY: number;
-  rotation: number;
-};
+export class Egg {
+  private posX: number;
+  private posY: number
+  private rotation: number;
 
-export function createEgg(maze: Maze): Egg {
-  while (true) {
-    const posX = Math.floor(random(maze.length / maze.cellLength) * maze.cellLength + maze.cellLength / 2);
-    const posY = Math.floor(random(maze.length / maze.cellLength) * maze.cellLength + maze.cellLength / 2);
-
-    if (maze.cells[posY][posX] === 0) {
-      maze.cells[posY][posX] = 25;
-      return { posX, posY, rotation: 0 };
+  constructor(private readonly maze: Maze) {
+    this.rotation = 0;
+    
+    while (true) {
+      this.posX = Math.floor(random(maze.length / maze.cellLength) * maze.cellLength + maze.cellLength / 2);
+      this.posY = Math.floor(random(maze.length / maze.cellLength) * maze.cellLength + maze.cellLength / 2);
+  
+      if (maze.cells[this.posY][this.posX] === 0) {
+        maze.cells[this.posY][this.posX] = 25;
+        break;
+      }
     }
   }
-}
 
-export function rotateEggs(world: World) {
-  world.eggs.forEach((egg) => {
-    egg.rotation++;
-    if (egg.rotation > 4) {
-      egg.rotation -= 5;
-    }
-    world.maze.cells[egg.posY][egg.posX] = 25 + egg.rotation;
-  });
+  public rotate() {
+    this.rotation = this.rotation == 4  ? 0 : this.rotation + 1;
+    this.maze.cells[this.posY][this.posX] = 25 + this.rotation ;    
+  } 
 }

@@ -1,6 +1,6 @@
 import { createMaze, Maze } from './maze';
 import { createSnipe, Snipe } from './snipes';
-import { createEgg, Egg } from './eggs';
+import { Egg } from './eggs';
 import { createHero, posX as heroPosX, posY as heroPosY } from './hero';
 import { Bullet } from './bullet';
 import { increaseEggScore, increaseSnipeScore } from './score';
@@ -22,7 +22,7 @@ export function createWorld(eggCount: number, screenWidth: number, screenHeight:
 
   const eggs: Egg[] = [];
   while (eggs.length < eggCount) {
-    eggs.push(createEgg(maze));
+    eggs.push(new Egg(maze));
     increaseEggScore();
   }
 
